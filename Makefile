@@ -19,16 +19,16 @@ secrets/postgres.env:
 	@echo "Generating postgres password in $@"
 	@echo "POSTGRES_PASSWORD=$(shell openssl rand -hex 32)" > $@
 
-secrets/oauth.env:
-	@echo "Need oauth.env file in secrets with GitHub parameters"
+secrets/lti.env:
+	@echo "Need lti.env file in secrets with Canvas parameters"
 	@exit 1
 
-secrets/jupyterhub.crt:
-	@echo "Need an SSL certificate in secrets/jupyterhub.crt"
+secrets/pgpmcert.pem:
+	@echo "Need an SSL certificate in secrets/pgpmcert.pem"
 	@exit 1
 
-secrets/jupyterhub.key:
-	@echo "Need an SSL key in secrets/jupyterhub.key"
+secrets/pgpmkey.pem:
+	@echo "Need an SSL key in secrets/pgpmkey.pem"
 	@exit 1
 
 userlist:
@@ -40,12 +40,12 @@ userlist:
 # Do not require cert/key files if SECRETS_VOLUME defined
 secrets_volume = $(shell echo $(SECRETS_VOLUME))
 ifeq ($(secrets_volume),)
-	cert_files=secrets/jupyterhub.crt secrets/jupyterhub.key
+	cert_files=secrets/pgpmcert.pem secrets/pgpmkey.pem
 else
 	cert_files=
 endif
 
-check-files: userlist $(cert_files) secrets/oauth.env secrets/postgres.env
+check-files: userlist $(cert_files) secrets/lti.env secrets/postgres.env
 
 pull:
 	docker pull $(DOCKER_NOTEBOOK_IMAGE)

@@ -6,11 +6,7 @@ import os
 
 c = get_config()
 
-# We rely on environment variables to configure JupyterHub so that we
-# avoid having to rebuild the JupyterHub container every time we change a
-# configuration parameter.
 
-# Spawn single-user servers as Docker containers
 c.JupyterHub.spawner_class = 'dockerspawner.DockerSpawner'
 # Spawn containers from this image
 c.DockerSpawner.container_image = os.environ['DOCKER_NOTEBOOK_IMAGE']
@@ -52,9 +48,6 @@ c.JupyterHub.port = 443
 c.JupyterHub.ssl_key = os.environ['SSL_KEY']
 c.JupyterHub.ssl_cert = os.environ['SSL_CERT']
 
-# Authenticate users with GitHub OAuth
-c.JupyterHub.authenticator_class = 'oauthenticator.GitHubOAuthenticator'
-c.GitHubOAuthenticator.oauth_callback_url = os.environ['OAUTH_CALLBACK_URL']
 
 # Persist hub data on volume mounted inside container
 data_dir = os.environ.get('DATA_VOLUME_CONTAINER', '/data')
@@ -84,3 +77,9 @@ with open(os.path.join(pwd, 'userlist')) as f:
             whitelist.add(name)
             if len(parts) > 1 and parts[1] == 'admin':
                 admin.add(name)
+
+# Canvas (LTI) authentication
+c.JupyterHub.authenticator_class = 'ltiauthenticator.LTIAuthenticator'
+c.LTIAuthenticator.consumers = {
+    os.environ['LTI_CLIENT_KEY']: os.environ['LTI_CLIENT_SECRET']
+}
